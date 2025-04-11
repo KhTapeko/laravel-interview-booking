@@ -15,64 +15,23 @@
     <!-- 主內容區 -->
     <main class="flex-grow pt-20 bg-gray-50"> <!-- pt-20 是為了避開 header -->
       <!-- 主視覺區塊＋搜尋 -->
-      <section class="relative bg-cover bg-center bg-no-repeat" style="background-image: url('/images/bg-dev.jpg')">
+      <section
+        class="relative bg-cover bg-center bg-no-repeat"
+        style="background-image: url('/images/bg-dev.jpg')"
+      >
         <div class="bg-white/80 py-16 shadow-md">
           <div class="container mx-auto px-4 text-center">
             <h2 class="text-4xl font-bold text-blue-700 mb-4">找到你的下一份理想工作</h2>
             <p class="text-lg text-gray-600 mb-6">專為企業與求職者打造的面試預約平台</p>
 
-            <!-- 搜尋欄位 -->
-            <div class="max-w-xl mx-auto mt-8 flex">
-              <input
-                v-model="search"
-                type="text"
-                placeholder="輸入職缺名稱、公司名稱"
-                class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-              <button
-                class="bg-blue-600 text-white px-6 py-3 rounded-r-lg hover:bg-blue-700 transition"
-              >
-                搜尋
-              </button>
-            </div>
+            <!-- 搜尋欄元件 -->
+            <JobSearchBar v-model="search" @submit="onSearchSubmit" />
           </div>
         </div>
       </section>
 
       <!-- 精選職缺卡片 -->
-      <section class="py-12">
-        <div class="container mx-auto px-4">
-          <h3 class="text-2xl font-semibold text-gray-800 mb-6">🔥 精選職缺</h3>
-
-          <div v-if="loading" class="text-gray-500">載入中...</div>
-          <div v-else-if="jobs.length === 0" class="text-gray-500">目前尚無職缺</div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" v-else>
-            <RouterLink
-              v-for="job in filteredJobs.slice(0, 6)"
-              :key="job.id"
-              :to="`/jobs/${job.id}`"
-              class="block bg-white rounded-xl shadow hover:shadow-md transition p-6 hover:ring-2 hover:ring-blue-300"
-            >
-              <h4 class="text-xl font-bold text-gray-800 mb-2">{{ job.title }}</h4>
-              <p class="text-gray-600 text-sm mb-2">{{ job.company }}</p>
-              <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
-                {{ job.type }}｜{{ job.interview_type === 'group' ? '團體面試' : '個人面試' }}
-              </span>
-            </RouterLink>
-          </div>
-
-          <div class="text-center mt-6">
-            <RouterLink
-              to="/jobs"
-              class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow"
-            >
-              查看更多職缺
-            </RouterLink>
-          </div>
-
-        </div>
-      </section>
+      <FeaturedJobs :search="search" />
 
     </main>
 
@@ -144,28 +103,17 @@
 
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
+import { ref } from 'vue'
+import JobSearchBar from '@/components/JobSearchBar.vue'
+import FeaturedJobs from '@/components/FeaturedJobs.vue'
 
-const jobs = ref([])
 const search = ref('')
-const loading = ref(true)
+const featuredRef = ref()
 
-onMounted(async () => {
-  try {
-    const res = await axios.get('http://localhost:8000/api/jobs')
-    jobs.value = res.data
-  } catch (err) {
-    console.error('載入職缺失敗', err)
-  } finally {
-    loading.value = false
+// ✅ 點搜尋按鈕時，主動呼叫 fetchJobs
+const onSearchSubmit = () => {
+  if (featuredRef.value?.fetchJobs) {
+    featuredRef.value.fetchJobs(search.value)
   }
-})
-
-const filteredJobs = computed(() =>
-  jobs.value.filter(job =>
-    job.title.includes(search.value) || job.company.includes(search.value)
-  )
-)
-
+}
 </script>
