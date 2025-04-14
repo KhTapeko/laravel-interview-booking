@@ -17,9 +17,25 @@ Route::middleware([Stateful::class])->group(function () {
     /* 登入 */
     Route::post('/login', [AuthController::class, 'login']);
 
+    /* 註冊 */
+    Route::post('/register', [AuthController::class, 'register']);
+
+    Route::get('/me', function (Request $request) {
+        if (Auth::check()) {
+            return response()->json([
+                'isLoggedIn' => true,
+                'user' => Auth::user(),
+            ]);
+        }
+    
+        return response()->json([
+            'isLoggedIn' => false,
+            'user' => null,
+        ]);
+    });
+
     /* 需要登入 */
     Route::middleware('auth')->group(function () {
-        Route::get('/me',      [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::prefix('api/interviews')->group(function () {

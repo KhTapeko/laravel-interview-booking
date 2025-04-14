@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
-import axios from '@/bootstrap';
+import { defineStore } from 'pinia'
+import axios from '@/bootstrap'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -10,23 +10,26 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async fetchUser() {
       try {
-        const { data } = await axios.get('/me');
-        this.user = data;
+        const { data } = await axios.get('/me')
+    
+        // 根據後端新的格式處理
+        this.user = data?.isLoggedIn ? data.user : null
+        return true
       } catch (err) {
-        if (err.response?.status !== 401) console.error(err);
-        this.user = null;
+        this.user = null
+        return false
       }
     },
 
     async login(email, password) {
-      await axios.get('/sanctum/csrf-cookie');
-      const { data } = await axios.post('/login', { email, password });
-      this.user = data;
+      await axios.get('/sanctum/csrf-cookie')
+      const { data } = await axios.post('/login', { email, password })
+      this.user = data
     },
 
     async logout() {
-      await axios.post('/logout');
-      this.user = null;
+      await axios.post('/logout')
+      this.user = null
     },
   },
-});
+})

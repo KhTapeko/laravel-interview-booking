@@ -36,8 +36,12 @@ router.beforeEach(async (to) => {
 
   // 首次導航嘗試還原登入
   if (auth.user === null && !auth._didFetch) {
-    auth._didFetch = true;
-    await auth.fetchUser();
+    auth._didFetch = true
+    try {
+      await auth.fetchUser()
+    } catch (e) {
+      // 完全吞掉錯誤
+    }
   }
 
   // 已登入者禁止進 guestOnly
