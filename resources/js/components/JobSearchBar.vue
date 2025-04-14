@@ -1,18 +1,3 @@
-<script setup>
-const props = defineProps({
-  modelValue: String
-})
-const emit = defineEmits(['update:modelValue', 'submit'])
-
-const updateSearch = (event) => {
-  emit('update:modelValue', event.target.value)
-}
-
-const onSearchClick = () => {
-  emit('submit') // 這是觸發 Home.vue 的 @submit
-}
-</script>
-
 <template>
   <div class="max-w-xl mx-auto mt-8 flex">
     <input
@@ -35,3 +20,18 @@ const onSearchClick = () => {
     </button>
   </div>
 </template>
+
+<script setup>
+const props = defineProps({
+  modelValue: String
+})
+const emit = defineEmits(['update:modelValue', 'submit'])
+
+const updateSearch = (event) => {
+  emit('update:modelValue', event.target.value)
+}
+
+const onSearchClick = () => {
+  emit('submit') // 這是觸發 Home.vue 的 @submit
+}
+</script>

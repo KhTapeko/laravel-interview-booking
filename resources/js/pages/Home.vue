@@ -1,17 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen">
 
-    <!-- 固定導覽列 -->
-    <header class="bg-white shadow fixed top-0 left-0 right-0 z-50">
-      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-blue-600">InterviewBooking</h1>
-        <div class="space-x-4">
-          <RouterLink to="/login" class="text-gray-600 hover:text-blue-600">登入</RouterLink>
-          <RouterLink to="/register" class="text-gray-600 hover:text-blue-600">註冊</RouterLink>
-        </div>
-      </div>
-    </header>
-
     <!-- 主內容區 -->
     <main class="flex-grow pt-20 bg-gray-50"> <!-- pt-20 是為了避開 header -->
       <!-- 主視覺區塊＋搜尋 -->
