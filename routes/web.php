@@ -47,7 +47,10 @@ Route::middleware([Stateful::class])->group(function () {
             Route::delete('{id}', [InterviewController::class, 'destroy']);
         });
 
+        // 用戶管理 
         Route::get('/api/admin/users', [UserController::class, 'index']);
+        Route::put('/api/admin/users/{id}', [UserController::class, 'update']); 
+        Route::delete('/api/admin/users/{id}', [UserController::class, 'destroy']);
     });
 });
 
