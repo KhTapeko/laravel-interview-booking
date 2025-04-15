@@ -5,6 +5,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful as Statefu
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\JobController;
 use App\Http\Controllers\InterviewController;
+use App\Http\Controllers\API\UserController;
 
 Route::middleware([Stateful::class])->group(function () {
 
@@ -45,6 +46,8 @@ Route::middleware([Stateful::class])->group(function () {
             Route::put('{id}',    [InterviewController::class, 'update']);
             Route::delete('{id}', [InterviewController::class, 'destroy']);
         });
+
+        Route::get('/api/admin/users', [UserController::class, 'index']);
     });
 });
 

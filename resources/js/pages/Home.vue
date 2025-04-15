@@ -2,7 +2,7 @@
   <div class="flex flex-col min-h-screen">
 
     <!-- 主內容區 -->
-    <main class="flex-grow pt-20 bg-gray-50"> <!-- pt-20 是為了避開 header -->
+    <main class="flex-grow pt-20 bg-gray-50">
       <!-- 主視覺區塊＋搜尋 -->
       <section
         class="relative bg-cover bg-center bg-no-repeat"
@@ -20,8 +20,7 @@
       </section>
 
       <!-- 精選職缺卡片 -->
-      <FeaturedJobs :search="search" />
-
+      <FeaturedJobs ref="featuredRef" :search="search" />
     </main>
 
     <!-- Footer -->
@@ -86,10 +85,8 @@
         </div>
       </section>
     </footer>
-
   </div>
 </template>
-
 
 <script setup>
 import { ref } from 'vue'
@@ -99,7 +96,6 @@ import FeaturedJobs from '@/components/FeaturedJobs.vue'
 const search = ref('')
 const featuredRef = ref()
 
-// ✅ 點搜尋按鈕時，主動呼叫 fetchJobs
 const onSearchSubmit = () => {
   if (featuredRef.value?.fetchJobs) {
     featuredRef.value.fetchJobs(search.value)

@@ -4,7 +4,7 @@ import Home from '@/pages/Home.vue';
 import Login from '@/pages/Login.vue';
 import Register from '@/pages/Register.vue';
 import JobDetail from '@/pages/JobDetail.vue'
-
+import UserManager from '@/pages/admin/UserManager.vue'
 
 const routes = [
   // Home 頁
@@ -15,6 +15,8 @@ const routes = [
   { path: '/login',     component: Login,    meta: { guestOnly: true } },
   // 註冊頁
   { path: '/register',  component: Register, meta: { guestOnly: true } },
+  // 使用者管理
+  { path: '/admin/users', component: UserManager, meta: { roles: ['admin'] } },
 
   /* 權限頁面 */
   //{ path: '/a', component: PageA, meta: { roles: ['admin'] } },
