@@ -3,6 +3,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -42,19 +45,35 @@ class AuthController extends Controller
     // 註冊
     public function register(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'candidate', // 預設為最低權限
-        ]);
-
-        // Auth::login($user); // 可移除自動登入（視需求）
-
-        return response()->json(['message' => '註冊成功'], 201);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:50',
+                'gender' => 'required|in:male,female,other',
+                'birthday' => 'required|date|before:today',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:6|confirmed',
+            ]);
+    
+            $user = User::create([
+                'email' => $request->email,
+                'password' => $request->password,
+                'role' => 'candidate',
+                'name' => $request->name,
+                'gender' => $request->gender,
+                'birthday' => $request->birthday,
+            ]);
+    
+            return response()->json(['message' => '註冊成功'], 201);
+    
+        } catch (ValidationException $e) {
+            // ✅ 保留原本 Laravel 的 422 回傳格式
+            throw $e;
+        } catch (Throwable $e) {
+            // ✅ 只處理非驗證型錯誤
+            return response()->json([
+                'message' => '後端發生錯誤',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
