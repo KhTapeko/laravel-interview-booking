@@ -15,6 +15,7 @@
       >
         <h3 class="text-xl font-bold text-gray-800">{{ job.title }}</h3>
         <p class="text-gray-500 text-sm">{{ job.company }} · {{ job.location }}</p>
+        <p class="text-sm text-gray-600">💰 薪資：{{ job.salary_min }} ~ {{ job.salary_max }} 元／月</p>
         <p class="text-gray-600 mt-2 line-clamp-3">{{ job.description }}</p>
         <p class="text-sm mt-2 font-medium">
           <span v-if="job.interview_type === 'individual'">👤 單人面試</span>
