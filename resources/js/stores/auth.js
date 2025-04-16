@@ -11,7 +11,6 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       try {
         const { data } = await axios.get('/me')
-    
         // 根據後端新的格式處理
         this.user = data?.isLoggedIn ? data.user : null
         return true
@@ -32,5 +31,15 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       window.location.reload()
     },
+
+    async loadFullProfile() {
+      try {
+        const { data } = await axios.get('/profile')
+        this.user = data
+      } catch (err) {
+        console.error('讀取完整個人資料失敗', err)
+      }
+    },
+
   },
 })

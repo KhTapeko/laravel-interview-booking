@@ -30,6 +30,23 @@ class UserController extends Controller
         return response()->json($query->orderBy('created_at', 'desc')->get());
     }
 
+    // 取得單一使用者資料
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'gender' => $user->gender,
+            'birthday' => $user->birthday,
+            'email' => $user->email,
+            'role' => $user->role,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+        ]);
+    }
+
     // 更新單一使用者資料
     public function update(Request $request, $id)
     {

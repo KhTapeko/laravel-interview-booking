@@ -28,7 +28,7 @@
           <RouterLink v-if="isAdmin" to="/admin/jobs" class="text-gray-700 hover:text-blue-600">職缺管理</RouterLink>
           <RouterLink v-if="isAdmin" to="/admin/timeslots" class="text-gray-700 hover:text-blue-600">時段管理</RouterLink>
 
-          <RouterLink to="/profile" class="text-sm text-gray-500 hover:text-blue-600">
+          <RouterLink to="/Profile" class="text-sm text-gray-500 hover:text-blue-600">
             {{ auth.user.name }} ({{ auth.user.role }})
           </RouterLink>
           <button @click="auth.logout" class="text-red-600 hover:text-red-700">登出</button>
@@ -49,7 +49,7 @@
 
         <template v-else>
           <!-- 使用者名子 + 身份 -->
-          <RouterLink to="/profile" class="text-sm text-gray-500 hover:text-blue-600">
+          <RouterLink to="/Profile" class="text-sm text-gray-500 hover:text-blue-600">
             {{ auth.user.name }} ({{ auth.user.role }})
           </RouterLink>
 
