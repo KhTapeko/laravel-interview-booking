@@ -71,7 +71,6 @@ class UserController extends Controller
         ]);
 
         $user->update($validated);
-
         return response()->json(['message' => '更新成功']);
     }
 
