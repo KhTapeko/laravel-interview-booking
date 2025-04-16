@@ -53,7 +53,9 @@ Route::middleware([Stateful::class])->group(function () {
         Route::delete('/api/admin/users/{id}', [UserController::class, 'destroy']);
 
         // user 個人用戶管理
-        Route::middleware('auth:sanctum')->get('/profile', [UserController::class, 'profile']);
+        Route::get('/profile', [UserController::class, 'profile']);
+        Route::put('/profile/update', [UserController::class, 'selfUpdate']);
+        Route::delete('/profile/delete', [UserController::class, 'selfDestroy']);
 
     });
 });

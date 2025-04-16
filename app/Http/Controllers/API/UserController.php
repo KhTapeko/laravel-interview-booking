@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -27,7 +28,11 @@ class UserController extends Controller
             });
         }
 
-        return response()->json($query->orderBy('created_at', 'desc')->get());
+        return response()->json(
+            $query->orderBy('created_at', 'desc')->get()->makeVisible([
+                'gender', 'birthday', 'created_at'
+            ])
+        );
     }
 
     // 取得單一使用者資料
@@ -47,7 +52,7 @@ class UserController extends Controller
         ]);
     }
 
-    // 更新單一使用者資料
+    // admin 更新單一使用者資料
     public function update(Request $request, $id)
     {
         $admin = Auth::user();
@@ -70,7 +75,7 @@ class UserController extends Controller
         return response()->json(['message' => '更新成功']);
     }
 
-    // 刪除使用者
+    // admin 刪除使用者
     public function destroy($id)
     {
         $admin = Auth::user();
@@ -83,4 +88,70 @@ class UserController extends Controller
 
         return response()->json(['message' => '刪除成功']);
     }
+
+    // 使用者編輯自己的資料
+    public function selfUpdate(Request $request)
+    {
+        $user = $request->user();
+    
+        $rules = [
+            'name' => 'required|string|max:50',
+            'gender' => 'required|in:male,female,other',
+            'birthday' => 'required|date|before:today',
+            'email' => "required|email|unique:users,email,{$user->id}",
+        ];
+    
+        // ✅ 若真的要改密碼（有填），才驗證密碼欄位
+        if ($request->filled('new_password')) {
+            $rules['current_password'] = 'required';
+            $rules['new_password'] = 'required|string|min:6|confirmed';
+        }
+    
+        $validated = $request->validate($rules);
+    
+        // ✅ 更新基本欄位
+        $user->update([
+            'name' => $validated['name'],
+            'gender' => $validated['gender'],
+            'birthday' => $validated['birthday'],
+            'email' => $validated['email'],
+        ]);
+    
+        // ✅ 密碼更新流程：用 $request->filled() 確保安全
+        if ($request->filled('new_password')) {
+            if (!Hash::check($request->input('current_password'), $user->password)) {
+                return response()->json([
+                    'errors' => ['current_password' => ['現有密碼不正確']]
+                ], 422);
+            }
+    
+            $user->password = $request->input('new_password');
+            $user->save();
+        }
+    
+        return response()->json(['message' => '個人資料更新成功']);
+    }
+    
+    
+
+    // 使用者刪除自己帳號
+    public function selfDestroy(Request $request)
+    {
+        $user = $request->user();
+    
+        // ✅ 預先記錄 ID，避免刪除後找不到
+        $id = $user->id;
+    
+        // ✅ 登出先處理，清除 session/cookie
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    
+        // ✅ 刪除帳號
+        User::where('id', $id)->delete();
+    
+        // ✅ 成功回應（不再 serialize 已刪除的 $user）
+        return response()->json(['message' => '帳號已刪除']);
+    }
+    
 }
