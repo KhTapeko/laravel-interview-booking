@@ -20,12 +20,11 @@ return new class extends Migration {
 
             $table->integer('salary_min')->nullable(); // 薪資下限
             $table->integer('salary_max')->nullable(); // 薪資上限
-            $table->string('salary_note')->nullable(); // 薪資備註說明（例：依經歷調整）
 
             $table->text('requirement')->nullable(); // 條件要求
             $table->text('benefits')->nullable(); // 福利制度
             $table->text('contact_info')->nullable(); // 聯絡資訊（聯絡人、電話等）
-
+            
             $table->foreignId('created_by') // 建立者（面試官／員工）
                 ->constrained('users')
                 ->onDelete('cascade');

@@ -26,18 +26,18 @@ class Job extends Model
         'created_by',
     ];
 
-    public function timeSlots()
-    {
-        return $this->hasMany(TimeSlot::class);
-    }
-
-    public function appointments()
-    {
-        return $this->hasManyThrough(Appointment::class, TimeSlot::class);
-    }
-
+    // ✅ 創建者（admin or employee） 從職缺 尋找創建者
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    // ✅ 多對多：被誰應徵了？
+    public function applicants()
+    {
+        return $this->belongsToMany(User::class)
+                    ->withTimestamps()
+                    ->withPivot(['status']);
+    }
+
 }
