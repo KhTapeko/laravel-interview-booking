@@ -24,6 +24,12 @@ class Job extends Model
         'benefits',
         'contact_info',
         'created_by',
+        'job_type',
+        'experience_required',
+        'education_level',
+        'work_schedule',
+        'remote_option',
+        'travel_required',
     ];
 
     // ✅ 創建者（admin or employee） 從職缺 尋找創建者
@@ -38,6 +44,11 @@ class Job extends Model
         return $this->belongsToMany(User::class)
                     ->withTimestamps()
                     ->withPivot(['status']);
+    }
+
+    public function scopeLatestFirst($query)
+    {
+        return $query->orderBy('updated_at', 'desc');
     }
 
 }

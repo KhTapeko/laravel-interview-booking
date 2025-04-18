@@ -57,6 +57,9 @@ Route::middleware([Stateful::class])->group(function () {
         Route::put('/profile/update', [UserController::class, 'selfUpdate']);
         Route::delete('/profile/delete', [UserController::class, 'selfDestroy']);
 
+        // job 應徵
+        Route::post('/api/jobs/{id}/apply', [JobController::class, 'apply']);
+        
     });
 });
 
