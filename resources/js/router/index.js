@@ -6,6 +6,7 @@ import Register from '@/pages/Register.vue';
 import JobDetail from '@/pages/JobDetail.vue'
 import UserManager from '@/pages/admin/UserManager.vue'
 import Profile from '@/pages/Profile.vue';
+import JobForm from '@/pages/JobForm.vue';
 
 const routes = [
   // Home 頁
@@ -20,6 +21,9 @@ const routes = [
   { path: '/admin/users', component: UserManager, meta: { roles: ['admin'] } },
   // 個人使用者管理
   { path: '/Profile', component: Profile, meta: { roles: ['admin', 'employee', 'candidate'] } },
+
+  // 職缺新增+編輯
+  { path: '/JobForm', component: JobForm, meta: { roles: ['admin', 'employee'] } },
 
   /* 權限頁面 */
   //{ path: '/a', component: PageA, meta: { roles: ['admin'] } },
