@@ -150,7 +150,7 @@
           </div>
           <div>
             <label class="form-label">條件要求</label>
-            <textarea v-model="form.requirements" rows="3" class="form-textarea"></textarea>
+            <textarea v-model="form.requirement" rows="3" class="form-textarea"></textarea>
           </div>
           <div>
             <label class="form-label">福利制度</label>
@@ -193,12 +193,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Save, Briefcase } from 'lucide-vue-next'
+import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 
-const props = defineProps({
-  job: Object,
-})
+const router = useRouter()
+const route = useRoute()
+const jobId = route.params.id || null
 
 const form = ref({
   title: '',
@@ -217,61 +219,96 @@ const form = ref({
   remote_option: false,
   travel_required: false,
   description: '',
-  requirements: '',
+  requirement: '',
   benefits: '',
+  contact_person: '',
   contact_email: '',
-  contact_phone: '',
+  contact_phone: ''
 })
 
 const errors = ref({})
 
-const submitForm = () => {
+onMounted(async () => {
+  if (jobId) {
+    try {
+      const res = await axios.get(`/api/jobs/${jobId}`)
+      const job = res.data
+
+      // 拆解 contact_info
+      let person = '', email = '', phone = ''
+      if (job.contact_info) {
+        const lines = job.contact_info.split('\n')
+        for (const line of lines) {
+          if (line.startsWith('姓名: ')) person = line.slice(4).trim()
+          if (line.startsWith('Email: ')) email = line.slice(7).trim()
+          if (line.startsWith('電話: ')) phone = line.slice(5).trim()
+        }
+      }
+
+      form.value = {
+        ...form.value,
+        ...job,
+        remote_option: !!job.remote_option,
+        travel_required: !!job.travel_required,
+        requirements: job.requirement ?? '',
+        contact_person: person,
+        contact_email: email,
+        contact_phone: phone?.toString() ?? '',
+      }
+    } catch (e) {
+      alert('載入職缺失敗')
+    }
+  }
+})
+
+
+const submitForm = async () => {
   errors.value = {}
+  const f = form.value
 
-  if (!form.value.title) {
-    errors.value.title = '職缺名稱為必填'
-  }
-  if (!form.value.company) {
-    errors.value.company = '公司名稱為必填'
-  }
-  if (!form.value.location) {
-    errors.value.location = '工作地點為必填'
-  }
-  if (!form.value.description) {
-    errors.value.description = '工作內容為必填'
-  }
-  if (!form.value.contact_person) {
-    errors.value.contact_person = '聯絡人為必填'
-  }
+  if (!f.title) errors.value.title = '職缺名稱為必填'
+  if (!f.company) errors.value.company = '公司名稱為必填'
+  if (!f.location) errors.value.location = '工作地點為必填'
+  if (!f.description) errors.value.description = '工作內容為必填'
+  if (!f.contact_person) errors.value.contact_person = '聯絡人為必填'
 
-  const emailValid = form.value.contact_email && /.+@.+\..+/.test(form.value.contact_email)
-  const phoneValid = form.value.contact_phone && /^\d{6,15}$/.test(form.value.contact_phone)
+  const emailValid = f.contact_email && /.+@.+\..+/.test(f.contact_email)
+  const phoneValid = f.contact_phone && /^\d{6,15}$/.test(f.contact_phone)
 
   if (!emailValid && !phoneValid) {
     errors.value.contact_email = '請填寫有效 Email 或電話，至少填寫一個'
     errors.value.contact_phone = '請填寫有效電話或 Email，至少填寫一個'
-  } else {
-    if (form.value.contact_email && !emailValid) {
-      errors.value.contact_email = 'Email 格式不正確'
-    }
-    if (form.value.contact_phone && !phoneValid) {
-      errors.value.contact_phone = '電話格式應為 6~15 位數字'
-    }
   }
 
-  if (form.value.salary_min === 0 || form.value.salary_min === null) {
+  if (f.salary_min === 0 || f.salary_max === 0) {
     errors.value.salary_min = '薪資下限不可為 0'
-  }
-  if (form.value.salary_max === 0 || form.value.salary_max === null) {
     errors.value.salary_max = '薪資上限不可為 0'
   }
 
   if (Object.keys(errors.value).length === 0) {
-    console.log('Submit', form.value)
-    // TODO: 實際送出 API
+    const payload = { ...f }
+    const contactLines = [`姓名: ${f.contact_person}`]
+    if (f.contact_email) contactLines.push(`Email: ${f.contact_email}`)
+    if (f.contact_phone) contactLines.push(`電話: ${f.contact_phone}`)
+    payload.contact_info = contactLines.join('\n')
+    delete payload.contact_person
+    delete payload.contact_email
+    delete payload.contact_phone
+
+    try {
+      if (jobId) {
+        await axios.put(`/api/jobs/${jobId}`, payload)
+        alert('更新成功')
+      } else {
+        await axios.post('/api/jobs', payload)
+        alert('新增成功')
+      }
+      router.push('/jobs')
+    } catch (e) {
+      alert('送出失敗')
+    }
   }
 }
-
 </script>
 
 <style scoped>

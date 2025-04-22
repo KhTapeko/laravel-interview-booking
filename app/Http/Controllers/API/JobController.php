@@ -63,4 +63,92 @@ class JobController extends Controller
         return response()->json(['message' => '應徵成功']);
     }
 
-}
+    // 新增職缺
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'company' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'interview_type' => 'required|in:individual,group',
+            'duration_minutes' => 'required|integer|min:30',
+            'target_applicants' => 'nullable|integer|min:1',
+            'salary_min' => 'required|integer|min:1',
+            'salary_max' => 'required|integer|min:1',
+            'salary_note' => 'nullable|string|max:255',
+            'requirement' => 'nullable|string',
+            'experience_required' => 'required|string|max:255',
+            'education_level' => 'required|string|max:255',
+            'benefits' => 'nullable|string',
+            'contact_info' => 'nullable|string',
+            'job_type' => 'required|string|max:255',
+            'work_schedule' => 'nullable|string|max:255',
+            'remote_option' => 'required|boolean',
+            'travel_required' => 'required|boolean',
+        ]);
+
+        // 這裡加上登入者 ID（created_by）
+        $validated['created_by'] = Auth::id();
+
+        $job = Job::create($validated);
+
+        return response()->json($job, 201);
+    }
+
+    // 更新職缺
+    public function update(Request $request, $id)
+    {
+        $job = Job::findOrFail($id);
+        $user = Auth::user();
+
+        // ✅ 權限判斷：只有 admin 或職缺建立者可以修改
+        if (!($user->role === 'admin' || ($user->role === 'employee' && $job->created_by === $user->id))) {
+            return response()->json(['message' => '你沒有權限修改此職缺'], 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'company' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'interview_type' => 'required|in:individual,group',
+            'duration_minutes' => 'required|integer|min:30',
+            'target_applicants' => 'nullable|integer|min:1',
+            'salary_min' => 'required|integer|min:1',
+            'salary_max' => 'required|integer|min:1',
+            'salary_note' => 'nullable|string|max:255',
+            'requirement' => 'nullable|string',
+            'experience_required' => 'required|string|max:255',
+            'education_level' => 'required|string|max:255',
+            'benefits' => 'nullable|string',
+            'contact_info' => 'nullable|string',
+            'job_type' => 'required|string|max:255',
+            'work_schedule' => 'nullable|string|max:255',
+            'remote_option' => 'required|boolean',
+            'travel_required' => 'required|boolean',
+        ]);
+
+        $job->update($validated);
+
+        return response()->json(['message' => '職缺更新成功', 'job' => $job]);
+    }
+
+    // 刪除職缺
+    public function destroy($id)
+    {
+        $job = Job::findOrFail($id);
+        $user = Auth::user();
+    
+        if (
+            $user->role === 'admin' ||
+            ($user->role === 'employee' && $job->created_by === $user->id)
+        ) {
+            $job->delete();
+            return response()->json(['message' => '職缺已刪除']);
+        }
+    
+        return response()->json(['message' => '你沒有權限刪除此職缺'], 403);
+    }
+    
+}   

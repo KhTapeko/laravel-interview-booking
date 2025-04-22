@@ -73,26 +73,46 @@
     </div>
   </section>
 
-  <!-- 我要應徵按鈕（固定底部） -->
+  <!-- 我要應徵 / 編輯 / 刪除 按鈕（固定底部） -->
   <div class="fixed bottom-0 inset-x-0 bg-white shadow-lg p-4 z-50 border-t">
-    <div class="max-w-3xl mx-auto">
-      <button
-        class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-full text-white text-lg font-semibold 
-              bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md hover:shadow-lg transition-all duration-200
-              hover:scale-[1.02] active:scale-[0.98]"
-        :disabled="hasApplied || !canApply"
-        @click="applyJob"
-      >
-        <template v-if="hasApplied">
-          ✅ 已應徵
-        </template>
-        <template v-else>
-          📝 我要應徵
-        </template>
-      </button>
+    <div class="max-w-3xl mx-auto flex gap-4 items-center">
+      <!-- 員工或管理員可以看到三個按鈕 -->
+      <template v-if="userRole === 'admin' || userRole === 'employee'">
+        <button
+          class="flex-1 basis-4/5 flex items-center justify-center gap-2 py-3 px-6 rounded-full text-white text-lg font-semibold 
+                bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md hover:shadow-lg transition-all duration-200
+                hover:scale-[1.02] active:scale-[0.98]"
+          :disabled="hasApplied || !canApply"
+          @click="applyJob"
+        >
+          <template v-if="hasApplied">✅ 已應徵</template>
+          <template v-else>📝 我要應徵</template>
+        </button>
+        <button
+          class="flex-1 basis-1/10 text-sm px-3 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200"
+          @click="editJob"
+        >編輯</button>
+        <button
+          class="flex-1 basis-1/10 text-sm px-3 py-2 text-red-600 border border-red-300 bg-red-50 rounded-lg hover:bg-red-100"
+          @click="deleteJob"
+        >刪除</button>
+      </template>
+
+      <!-- 應徵者僅能看到應徵按鈕 -->
+      <template v-else>
+        <button
+          class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-full text-white text-lg font-semibold 
+                bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md hover:shadow-lg transition-all duration-200
+                hover:scale-[1.02] active:scale-[0.98]"
+          :disabled="hasApplied || !canApply"
+          @click="applyJob"
+        >
+          <template v-if="hasApplied">✅ 已應徵</template>
+          <template v-else>📝 我要應徵</template>
+        </button>
+      </template>
     </div>
   </div>
-
 
 </template>
 
@@ -107,6 +127,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const user = auth.user
+const userRole = user?.role
 
 const job = ref(null)
 const hasApplied = ref(false)
@@ -114,12 +135,9 @@ const hasApplied = ref(false)
 onMounted(async () => {
   const res = await axios.get(`/api/jobs/${route.params.id}`)
   job.value = res.data
-
-  // Laravel API 回傳的 has_applied
   hasApplied.value = res.data.has_applied === true
 })
 
-// ✅ 報名人數文字轉換
 const applicantRange = computed(() => {
   const count = job.value?.applicants_count ?? 0
   if (count === 0) return '目前無人應徵'
@@ -129,12 +147,10 @@ const applicantRange = computed(() => {
   return '20 人以上'
 })
 
-// ✅ 是否可應徵
 const canApply = computed(() => {
   return ['candidate', 'employee'].includes(user?.role)
 })
 
-// ✅ 點擊應徵
 const applyJob = async () => {
   if (!user?.id) {
     alert('請先登入')
@@ -149,4 +165,46 @@ const applyJob = async () => {
     alert(err.response?.data?.message || '應徵失敗')
   }
 }
+
+const editJob = () => {
+  router.push(`/jobs/${route.params.id}/edit`)
+}
+
+const deleteJob = async () => {
+  if (!confirm('確定要刪除此職缺嗎？')) return
+  try {
+    await axios.delete(`/api/jobs/${route.params.id}`)
+    alert('刪除成功')
+    router.push('/jobs')
+  } catch (err) {
+    alert(err.response?.data?.message || '刪除失敗')
+  }
+}
 </script>
+
+<style scoped>
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+.form-input {
+  @apply w-full rounded-xl border border-gray-300 px-4 py-2 shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition;
+}
+.form-textarea {
+  @apply w-full rounded-xl border border-gray-300 px-4 py-2 shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+.animate-shake {
+  animation: shake 0.3s ease;
+}
+.animate-fade-in {
+  animation: fade-in 0.5s ease forwards;
+  opacity: 0;
+}
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+</style>

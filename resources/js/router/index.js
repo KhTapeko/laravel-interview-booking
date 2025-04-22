@@ -22,8 +22,10 @@ const routes = [
   // 個人使用者管理
   { path: '/Profile', component: Profile, meta: { roles: ['admin', 'employee', 'candidate'] } },
 
-  // 職缺新增+編輯
-  { path: '/JobForm', component: JobForm, meta: { roles: ['admin', 'employee'] } },
+  // 職缺新增
+  { path: '/jobs/create', component: JobForm, props: true, meta: { roles: ['admin', 'employee'] } },
+  // 職缺編輯
+  { path: '/jobs/:id/edit', component: JobForm, props: true, meta: { roles: ['admin', 'employee'] } },
 
   /* 權限頁面 */
   //{ path: '/a', component: PageA, meta: { roles: ['admin'] } },
@@ -61,6 +63,7 @@ router.beforeEach(async (to) => {
     if (!auth.user) return '/login';                    // 未登入
     if (!to.meta.roles.includes(auth.user.role)) return '/'; // 無權限 → 回首頁
   }
+  return true;
 });
 
 export default router;

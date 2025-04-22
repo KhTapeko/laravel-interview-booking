@@ -57,9 +57,17 @@ Route::middleware([Stateful::class])->group(function () {
         Route::put('/profile/update', [UserController::class, 'selfUpdate']);
         Route::delete('/profile/delete', [UserController::class, 'selfDestroy']);
 
-        // job 應徵
-        Route::post('/api/jobs/{id}/apply', [JobController::class, 'apply']);
-        
+        Route::prefix('/api/jobs')->group(function () {
+            // 新增職缺
+            Route::post('/',        [JobController::class, 'store']);
+            // 更新職缺
+            Route::put('{id}',      [JobController::class, 'update']);
+            // 刪除職缺
+            Route::delete('{id}',   [JobController::class, 'destroy']);
+            // 應徵職缺
+            Route::post('{id}/apply', [JobController::class, 'apply']);
+        });
+
     });
 });
 
