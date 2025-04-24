@@ -18,16 +18,15 @@
       <!-- 桌面版導覽列內容 -->
       <div class="hidden md:flex items-center space-x-4">
         <template v-if="!auth.user">
+          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600">所有職缺</RouterLink>
           <RouterLink to="/login" class="text-gray-600 hover:text-blue-600">登入</RouterLink>
           <RouterLink to="/register" class="text-gray-600 hover:text-blue-600">註冊</RouterLink>
         </template>
         <template v-else>
-          <RouterLink v-if="isCandidate" to="/my/applications" class="text-gray-700 hover:text-blue-600">我的申請</RouterLink>
-          <RouterLink v-if="isEmployee" to="/employee/interviews" class="text-gray-700 hover:text-blue-600">面試管理</RouterLink>
+          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600">所有職缺</RouterLink>
+          <RouterLink v-if="isCandidate || isEmployee" to="/my/applications" class="text-gray-700 hover:text-blue-600">我的申請</RouterLink>
+          <RouterLink v-if="isEmployee || isAdmin" to="/jobs/create" class="text-gray-700 hover:text-blue-600">新增職缺</RouterLink>
           <RouterLink v-if="isAdmin" to="/admin/users" class="text-gray-700 hover:text-blue-600">用戶管理</RouterLink>
-          <RouterLink v-if="isAdmin" to="/admin/jobs" class="text-gray-700 hover:text-blue-600">職缺管理</RouterLink>
-          <RouterLink v-if="isAdmin" to="/admin/timeslots" class="text-gray-700 hover:text-blue-600">時段管理</RouterLink>
-
           <RouterLink to="/Profile" class="text-sm text-gray-500 hover:text-blue-600">
             {{ auth.user.name }} ({{ auth.user.role }})
           </RouterLink>
@@ -43,6 +42,7 @@
         class="md:hidden flex flex-col items-center space-y-3 px-6 pb-6 pt-4 bg-white shadow-lg border-t border-gray-200 rounded-b-lg z-50 text-center"
       >
         <template v-if="!auth.user">
+          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600 font-medium">所有職缺</RouterLink>
           <RouterLink to="/login" class="text-gray-700 hover:text-blue-600 font-medium">登入</RouterLink>
           <RouterLink to="/register" class="text-gray-700 hover:text-blue-600 font-medium">註冊</RouterLink>
         </template>
@@ -54,12 +54,10 @@
           </RouterLink>
 
           <!-- 功能選單 -->
-          <RouterLink v-if="isCandidate" to="/my/applications" class="text-gray-700 hover:text-blue-600 font-medium">我的申請</RouterLink>
-          <RouterLink v-if="isEmployee" to="/employee/interviews" class="text-gray-700 hover:text-blue-600 font-medium">面試管理</RouterLink>
+          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600 font-medium">所有職缺</RouterLink>
+          <RouterLink v-if="isCandidate || isEmployee" to="/my/applications" class="text-gray-700 hover:text-blue-600 font-medium">我的申請</RouterLink>
+          <RouterLink v-if="isEmployee || isAdmin" to="/jobs/create" class="text-gray-700 hover:text-blue-600 font-medium">新增職缺</RouterLink>
           <RouterLink v-if="isAdmin" to="/admin/users" class="text-gray-700 hover:text-blue-600 font-medium">用戶管理</RouterLink>
-          <RouterLink v-if="isAdmin" to="/admin/jobs" class="text-gray-700 hover:text-blue-600 font-medium">職缺管理</RouterLink>
-          <RouterLink v-if="isAdmin" to="/admin/timeslots" class="text-gray-700 hover:text-blue-600 font-medium">時段管理</RouterLink>
-
           <!-- 登出 -->
           <button @click="auth.logout" class="text-red-600 hover:text-red-700 font-medium pt-2">登出</button>
         </template>

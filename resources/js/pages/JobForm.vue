@@ -239,11 +239,12 @@ onMounted(async () => {
       if (job.contact_info) {
         const lines = job.contact_info.split('\n')
         for (const line of lines) {
-          if (line.startsWith('姓名: ')) person = line.slice(4).trim()
-          if (line.startsWith('Email: ')) email = line.slice(7).trim()
-          if (line.startsWith('電話: ')) phone = line.slice(5).trim()
+          if (line.startsWith('姓名: ')) person = line.replace('姓名: ', '').trim()
+          if (line.startsWith('Email: ')) email = line.replace('Email: ', '').trim()
+          if (line.startsWith('電話: ')) phone = line.replace('電話: ', '').trim()
         }
       }
+
 
       form.value = {
         ...form.value,
@@ -296,14 +297,18 @@ const submitForm = async () => {
     delete payload.contact_phone
 
     try {
+      let savedId = jobId
+
       if (jobId) {
         await axios.put(`/api/jobs/${jobId}`, payload)
         alert('更新成功')
       } else {
-        await axios.post('/api/jobs', payload)
+        const res = await axios.post('/api/jobs', payload)
         alert('新增成功')
+        savedId = res.data.id // 從後端拿到新建立職缺的 id
       }
-      router.push('/jobs')
+
+      router.push(`/jobs/${savedId}`)
     } catch (e) {
       alert('送出失敗')
     }
