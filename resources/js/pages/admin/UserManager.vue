@@ -85,12 +85,15 @@ const deleteUser = async (id) => {
 
   try {
     await axios.delete(`/api/admin/users/${id}`)
-    alert('刪除成功')
+    alert('✅ 使用者已成功刪除')
     await fetchUsers()
   } catch (err) {
-    alert('刪除失敗：' + (err?.response?.data?.message || '未知錯誤'))
+    const message = err?.response?.data?.message || '❌ 刪除失敗，請稍後再試'
+    alert(message)
+    console.error('[刪除使用者錯誤]', err)
   }
 }
+
 
 const editUser = (id) => {
   editingId.value = editingId.value === id ? null : id

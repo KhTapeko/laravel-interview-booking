@@ -78,24 +78,36 @@
     <div class="max-w-3xl mx-auto flex gap-4 items-center">
       <!-- 員工或管理員可以看到三個按鈕 -->
       <template v-if="userRole === 'admin' || userRole === 'employee'">
-        <button
-          class="flex-1 basis-4/5 flex items-center justify-center gap-2 py-3 px-6 rounded-full text-white text-lg font-semibold 
-                bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md hover:shadow-lg transition-all duration-200
-                hover:scale-[1.02] active:scale-[0.98]"
-          :disabled="hasApplied || !canApply"
-          @click="applyJob"
-        >
-          <template v-if="hasApplied">✅ 已應徵</template>
-          <template v-else>📝 我要應徵</template>
-        </button>
-        <button
-          class="flex-1 basis-1/10 text-sm px-3 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200"
-          @click="editJob"
-        >編輯</button>
-        <button
-          class="flex-1 basis-1/10 text-sm px-3 py-2 text-red-600 border border-red-300 bg-red-50 rounded-lg hover:bg-red-100"
-          @click="deleteJob"
-        >刪除</button>
+        <div class="flex gap-3 w-full">
+          <!-- 📝 我要應徵 -->
+          <button
+            class="basis-4/5 py-3 px-6 rounded-xl text-white font-semibold text-base
+                  bg-gradient-to-r from-blue-500 to-indigo-600 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition"
+            :disabled="hasApplied || !canApply"
+            @click="applyJob"
+          >
+            <template v-if="hasApplied">✅ 已應徵</template>
+            <template v-else>📝 我要應徵</template>
+          </button>
+
+          <!-- ✏️ 編輯 -->
+          <button
+            class="basis-1/10 py-3 px-4 rounded-xl text-gray-700 font-semibold text-sm
+                  bg-gray-100 hover:bg-gray-200 hover:shadow-sm transition"
+            @click="editJob"
+          >
+            編輯
+          </button>
+
+          <!-- 🗑 刪除 -->
+          <button
+            class="basis-1/10 py-3 px-4 rounded-xl text-red-600 font-semibold text-sm
+                  bg-red-100 hover:bg-red-200 hover:shadow-sm transition"
+            @click="deleteJob"
+          >
+            刪除
+          </button>
+        </div>
       </template>
 
       <!-- 應徵者僅能看到應徵按鈕 -->

@@ -81,13 +81,22 @@ class UserController extends Controller
         if (!$admin || $admin->role !== 'admin') {
             return response()->json(['message' => '無權限'], 403);
         }
-
+    
         $user = User::findOrFail($id);
+    
+        // 若為 employee，判斷是否有建立職缺
+        if ($user->role === 'employee') {
+            $hasJobs = $user->createdJobs()->exists(); // ✅ 改成 createdJobs 關聯
+            if ($hasJobs) {
+                return response()->json(['message' => '該員工有建立職缺，無法刪除'], 400);
+            }
+        }
+    
         $user->delete();
-
+    
         return response()->json(['message' => '刪除成功']);
     }
-
+    
     // 使用者編輯自己的資料
     public function selfUpdate(Request $request)
     {
@@ -137,20 +146,29 @@ class UserController extends Controller
     public function selfDestroy(Request $request)
     {
         $user = $request->user();
+
+        // 🛡️ 強制中斷邏輯：若是 employee 且有職缺，不允許刪除
+        if ($user->role === 'employee') {
+            $hasJobs = $user->createdJobs()->exists(); // ✅ 改為 createdJobs 關聯
+            if ($hasJobs) {
+                return response()->json([
+                    'message' => '您尚有建立的職缺，無法刪除帳號'
+                ], 400);
+            }
+        }
+
+        // ✅ 確保這邊絕對只會執行在通過檢查之後
+        $userId = $user->id;
     
-        // ✅ 預先記錄 ID，避免刪除後找不到
-        $id = $user->id;
-    
-        // ✅ 登出先處理，清除 session/cookie
+        // ✅ 登出 → 如果用 token，也建議手動清除
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
     
         // ✅ 刪除帳號
-        User::where('id', $id)->delete();
-    
-        // ✅ 成功回應（不再 serialize 已刪除的 $user）
+        User::where('id', $userId)->delete();
+        
         return response()->json(['message' => '帳號已刪除']);
-    }
-    
+    }    
+
 }

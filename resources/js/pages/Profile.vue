@@ -57,15 +57,17 @@ const confirmDelete = async () => {
   if (!confirm('確定要刪除帳號嗎？此操作無法復原。')) return
 
   try {
-    await axios.delete('/profile/delete') // ✅ 已內含登出與刪除
-
+    await axios.delete('/profile/delete') // ✅ Laravel 已內含 logout 與刪除邏輯
     auth.user = null
     alert('帳號已刪除')
     window.location.href = '/'
   } catch (err) {
-    alert('刪除失敗')
+    // ✅ 顯示 Laravel 後端傳來的錯誤訊息（message）
+    const msg = err.response?.data?.message || '刪除失敗，請稍後再試'
+    alert(msg)
     console.error(err)
   }
 }
+
 
 </script>
