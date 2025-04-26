@@ -2,7 +2,7 @@
   <div class="flex flex-col min-h-screen">
 
     <!-- 主內容區 -->
-    <main class="flex-grow pt-20 bg-gray-50">
+    <main class="flex-grow pt-10 bg-gray-50">
       <!-- 主視覺區塊＋搜尋 -->
       <section
         class="relative bg-cover bg-center bg-no-repeat"
@@ -19,8 +19,12 @@
         </div>
       </section>
 
-      <!-- 精選職缺卡片 -->
-      <FeaturedJobs ref="featuredRef" :search="search" />
+      <!-- 精選職缺 -->
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-2xl font-bold text-gray-700 mt-8">✨ 精選職缺</h2>
+        <FeaturedJobs :jobs="jobs" />
+      </div>
+
     </main>
 
     <!-- Footer -->
@@ -89,16 +93,50 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import axios from 'axios'
+import debounce from 'lodash.debounce' // <--- 加上 debounce
 import JobSearchBar from '@/components/JobSearchBar.vue'
 import FeaturedJobs from '@/components/FeaturedJobs.vue'
 
 const search = ref('')
-const featuredRef = ref()
+const jobs = ref([])
 
-const onSearchSubmit = () => {
-  if (featuredRef.value?.fetchJobs) {
-    featuredRef.value.fetchJobs(search.value)
+// ✅ 抓職缺資料 function
+const fetchJobs = async (keyword = '') => {
+  try {
+    const res = await axios.get('/api/jobs', {
+      params: { search: keyword }
+    })
+    jobs.value = res.data
+  } catch (err) {
+    console.error('載入職缺失敗', err)
   }
 }
+
+// ✅ 打字即時搜尋（加 debounce）
+const debouncedFetchJobs = debounce((keyword) => {
+  fetchJobs(keyword)
+}, 300) // 300ms 停止打字後才搜尋
+
+// ✅ 監聽輸入框，打字觸發即時搜尋
+watch(search, (newKeyword) => {
+  debouncedFetchJobs(newKeyword)
+})
+
+// ✅ 按下搜尋按鈕時
+const onSearchSubmit = () => {
+  fetchJobs(search.value) // 直接即時搜尋，不等 debounce
+}
+
+// ✅ 頁面初次載入時
+const fetchFeaturedJobs = async () => {
+  try {
+    const res = await axios.get('/api/jobs')
+    jobs.value = res.data
+  } catch (err) {
+    console.error('精選職缺載入失敗', err)
+  }
+}
+fetchFeaturedJobs()
 </script>

@@ -18,12 +18,12 @@
       <!-- 桌面版導覽列內容 -->
       <div class="hidden md:flex items-center space-x-4">
         <template v-if="!auth.user">
-          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600">所有職缺</RouterLink>
+          <RouterLink to="/JobList" class="text-gray-700 hover:text-blue-600">所有職缺</RouterLink>
           <RouterLink to="/login" class="text-gray-600 hover:text-blue-600">登入</RouterLink>
           <RouterLink to="/register" class="text-gray-600 hover:text-blue-600">註冊</RouterLink>
         </template>
         <template v-else>
-          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600">所有職缺</RouterLink>
+          <RouterLink to="/JobList" class="text-gray-700 hover:text-blue-600">所有職缺</RouterLink>
           <RouterLink v-if="isCandidate || isEmployee" to="/my/applications" class="text-gray-700 hover:text-blue-600">我的申請</RouterLink>
           <RouterLink v-if="isEmployee || isAdmin" to="/jobs/create" class="text-gray-700 hover:text-blue-600">新增職缺</RouterLink>
           <RouterLink v-if="isAdmin" to="/admin/users" class="text-gray-700 hover:text-blue-600">用戶管理</RouterLink>
@@ -42,7 +42,7 @@
         class="md:hidden flex flex-col items-center space-y-3 px-6 pb-6 pt-4 bg-white shadow-lg border-t border-gray-200 rounded-b-lg z-50 text-center"
       >
         <template v-if="!auth.user">
-          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600 font-medium">所有職缺</RouterLink>
+          <RouterLink to="/JobList" class="text-gray-700 hover:text-blue-600 font-medium">所有職缺</RouterLink>
           <RouterLink to="/login" class="text-gray-700 hover:text-blue-600 font-medium">登入</RouterLink>
           <RouterLink to="/register" class="text-gray-700 hover:text-blue-600 font-medium">註冊</RouterLink>
         </template>
@@ -54,7 +54,7 @@
           </RouterLink>
 
           <!-- 功能選單 -->
-          <RouterLink to="/jobs" class="text-gray-700 hover:text-blue-600 font-medium">所有職缺</RouterLink>
+          <RouterLink to="/JobList" class="text-gray-700 hover:text-blue-600 font-medium">所有職缺</RouterLink>
           <RouterLink v-if="isCandidate || isEmployee" to="/my/applications" class="text-gray-700 hover:text-blue-600 font-medium">我的申請</RouterLink>
           <RouterLink v-if="isEmployee || isAdmin" to="/jobs/create" class="text-gray-700 hover:text-blue-600 font-medium">新增職缺</RouterLink>
           <RouterLink v-if="isAdmin" to="/admin/users" class="text-gray-700 hover:text-blue-600 font-medium">用戶管理</RouterLink>

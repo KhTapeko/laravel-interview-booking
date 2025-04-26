@@ -7,12 +7,15 @@ import JobDetail from '@/pages/JobDetail.vue'
 import UserManager from '@/pages/admin/UserManager.vue'
 import Profile from '@/pages/Profile.vue';
 import JobForm from '@/pages/JobForm.vue';
+import JobList from '../pages/JobList.vue';
 
 const routes = [
   // Home 頁
   { path: '/',          component: Home },
   // 職缺詳情頁
   { path: '/jobs/:id', component: JobDetail },
+  // 所有職缺
+  { path: '/JobList', component: JobList },
   // 登入頁
   { path: '/login',     component: Login,    meta: { guestOnly: true } },
   // 註冊頁

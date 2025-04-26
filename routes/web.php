@@ -11,6 +11,7 @@ Route::middleware([Stateful::class])->group(function () {
 
     /* 公開 API */
     Route::prefix('api')->group(function () {
+        Route::get('/jobs/all', [JobController::class, 'listAll']);
         Route::get('/jobs',      [JobController::class, 'index']);
         Route::get('/jobs/{id}', [JobController::class, 'show']);
     });

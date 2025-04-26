@@ -24,6 +24,21 @@ class JobController extends Controller
         return $query->latest()->take(6)->get();
     }
 
+    // 所有job 
+    public function listAll(Request $request)
+    {
+        $query = Job::query();
+
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('company', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->latest()->get(); // 取得所有職缺，不限筆數
+    }
+
     // 顯示job所有資料+ 應徵人數
     public function show($id)
     {
